@@ -37,7 +37,7 @@ def stucki_dither(image):
             pixels[y, x] = new_pixel
             error = old_pixel - new_pixel
 
-            # 分散误差
+            # 分散誤差
             if x + 1 < width:
                 pixels[y, x + 1] += error * 8 / 42
             if x + 2 < width:
@@ -67,18 +67,18 @@ def stucki_dither(image):
 
     return np.clip(pixels, 0, 255).astype(np.uint8)
 
-# 读取灰度图像
+# 讀入原圖
 image = cv2.imread('photos/profile_photo_1025.jpg', cv2.IMREAD_GRAYSCALE)
 if image is None:
     raise FileNotFoundError('Image file not found.')
 
-# 应用 Stucki Dithering
+# 執行 Stucki Dithering
 dithered_image = stucki_dither(image)
 
-# 保存处理后的图像
+# 儲存結果圖
 cv2.imwrite('photos/stucki_dithering.png', dithered_image)
 
-# 显示原图和处理后的图像
+# 顯示原圖與結果圖
 show_img('Original Image', image)
 show_img('Dithered Image', dithered_image)
 cv2.waitKey(0)

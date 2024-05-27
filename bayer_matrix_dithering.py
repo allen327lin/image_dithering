@@ -43,46 +43,63 @@ def ordered_dither(image, bayer_matrix):
 
     return dithered_image
 
-# 定义 Bayer 矩阵
-bayer_2x2 = [
-    [0, 2],
-    [3, 1]
-]
+def generate_bayer_matrix(n):
+    if n == 1:
+        return np.array([[0]])
+    else:
+        smaller_matrix = generate_bayer_matrix(n // 2)
+        size = smaller_matrix.shape[0]
+        new_matrix = np.zeros((n, n), dtype=int)
+        new_matrix[0:size, 0:size] = 4 * smaller_matrix
+        new_matrix[0:size, size:n] = 4 * smaller_matrix + 2
+        new_matrix[size:n, 0:size] = 4 * smaller_matrix + 3
+        new_matrix[size:n, size:n] = 4 * smaller_matrix + 1
+        return new_matrix
 
-bayer_4x4 = [
-    [ 0,  8,  2, 10],
-    [12,  4, 14,  6],
-    [ 3, 11,  1,  9],
-    [15,  7, 13,  5]
-]
+bayer_2x2 = generate_bayer_matrix(2)
+bayer_4x4 = generate_bayer_matrix(4)
+bayer_8x8 = generate_bayer_matrix(8)
+bayer_16x16 = generate_bayer_matrix(16)
 
-bayer_8x8 = [
-    [ 0, 32,  8, 40,  2, 34, 10, 42],
-    [48, 16, 56, 24, 50, 18, 58, 26],
-    [12, 44,  4, 36, 14, 46,  6, 38],
-    [60, 28, 52, 20, 62, 30, 54, 22],
-    [ 3, 35, 11, 43,  1, 33,  9, 41],
-    [51, 19, 59, 27, 49, 17, 57, 25],
-    [15, 47,  7, 39, 13, 45,  5, 37],
-    [63, 31, 55, 23, 61, 29, 53, 21]
-]
+# bayer_2x2 = [
+#     [0, 2],
+#     [3, 1]
+# ]
 
-# 读取灰度图像
+# bayer_4x4 = [
+#     [ 0,  8,  2, 10],
+#     [12,  4, 14,  6],
+#     [ 3, 11,  1,  9],
+#     [15,  7, 13,  5]
+# ]
+
+# bayer_8x8 = [
+#     [ 0, 32,  8, 40,  2, 34, 10, 42],
+#     [48, 16, 56, 24, 50, 18, 58, 26],
+#     [12, 44,  4, 36, 14, 46,  6, 38],
+#     [60, 28, 52, 20, 62, 30, 54, 22],
+#     [ 3, 35, 11, 43,  1, 33,  9, 41],
+#     [51, 19, 59, 27, 49, 17, 57, 25],
+#     [15, 47,  7, 39, 13, 45,  5, 37],
+#     [63, 31, 55, 23, 61, 29, 53, 21]
+# ]
+
+# 讀入原圖
 image = cv2.imread('photos/profile_photo_1025.jpg', cv2.IMREAD_GRAYSCALE)
 if image is None:
     raise FileNotFoundError('Image file not found.')
 
-# 应用 Bayer Matrix (Ordered Dithering)
+# 執行 Bayer Matrix (Ordered Dithering)
 dithered_image_2x2 = ordered_dither(image, bayer_2x2)
 dithered_image_4x4 = ordered_dither(image, bayer_4x4)
 dithered_image_8x8 = ordered_dither(image, bayer_8x8)
 
-# 保存处理后的图像
+# 儲存結果圖
 cv2.imwrite('photos/bayer_matrix_dithering_2x2.png', dithered_image_2x2)
 cv2.imwrite('photos/bayer_matrix_dithering_4x4.png', dithered_image_4x4)
 cv2.imwrite('photos/bayer_matrix_dithering_8x8.png', dithered_image_8x8)
 
-# 显示原图和处理后的图像
+# 顯示原圖與結果圖
 show_img('Original Image', image)
 show_img('Dithered Image 2x2', dithered_image_2x2)
 show_img('Dithered Image 4x4', dithered_image_4x4)

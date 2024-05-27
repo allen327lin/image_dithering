@@ -27,11 +27,9 @@ import numpy as np
 from utils import show_img
 
 def jarvis_judice_ninke_dither(image):
-    # 将图像转换为浮点型，以便进行误差扩散
     pixels = image.astype(float)
     height, width = pixels.shape
 
-    # 遍历每一个像素
     for y in range(height):
         for x in range(width):
             old_pixel = pixels[y, x]
@@ -39,7 +37,7 @@ def jarvis_judice_ninke_dither(image):
             pixels[y, x] = new_pixel
             error = old_pixel - new_pixel
 
-            # 分散误差
+            # 分散誤差
             if x + 1 < width:
                 pixels[y, x + 1] += error * 7 / 48
             if x + 2 < width:
@@ -67,21 +65,21 @@ def jarvis_judice_ninke_dither(image):
                 if x + 2 < width:
                     pixels[y + 2, x + 2] += error * 1 / 48
 
-    # 将像素值限制在0到255之间，并转换回8位无符号整数类型
+    # 將像素值壓在0到255之間，並轉成8-bit整數類型使符合照片格式
     return np.clip(pixels, 0, 255).astype(np.uint8)
 
-# 读取灰度图像
+# 讀入原圖
 image = cv2.imread('photos/profile_photo_1025.jpg', cv2.IMREAD_GRAYSCALE)
 if image is None:
     raise FileNotFoundError('Image file not found.')
 
-# 应用 Jarvis, Judice, and Ninke Dithering
+# 執行 Jarvis, Judice, and Ninke Dithering
 dithered_image = jarvis_judice_ninke_dither(image)
 
-# 保存处理后的图像
+# 儲存結果圖
 cv2.imwrite('photos/JJN_dithering.png', dithered_image)
 
-# 显示原图和处理后的图像
+# 顯示原圖與結果圖
 show_img('Original Image', image)
 show_img('Dithered Image', dithered_image)
 cv2.waitKey(0)
