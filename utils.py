@@ -24,36 +24,33 @@ SOFTWARE.
 
 import numpy as np
 import cv2
+from skimage.metrics import structural_similarity as ssim
 
 
-def show_img(title, img, save_img=False):
-    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(title, 400, 400)
-    cv2.imshow(title, img)
+def show_img(title, img, save_img=False):    # 顯示圖片
+    cv2.namedWindow(title, cv2.WINDOW_NORMAL)    # 創建視窗
+    cv2.resizeWindow(title, 400, 400)    # 設定視窗大小
+    cv2.imshow(title, img)    # 顯示圖片
     if save_img:
-        cv2.imwrite("./photos/results/" + title + ".png", img)
+        cv2.imwrite("./photos/results/" + title + ".png", img)    # 儲存圖片
     return 0
 
 
-def show_fft(title, fft, save_img=False):
-    fft = np.log(np.abs(fft) + 1)
-    fft = fft / fft.max() * 255.0
-    fft = np.uint8(fft)
+def convert_to_0_and_255(image_8_bit):
+    # 將>=127的地方設成255，<127的地方設成0
+    _, image_1_bit = cv2.threshold(image_8_bit, 127, 255, cv2.THRESH_BINARY)
+    return image_1_bit
 
-    cv2.namedWindow(title, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(title, 400, 400)
-    cv2.imshow(title, fft)
-    if save_img:
-        cv2.imwrite("./photos/results/" + title + ".png", fft)
 
-    return 0
+def compare_ssim(img1, img2):
+    score, diff = ssim(img1, img2, full=True)    # 比對img1和img2，返回結構相似性的圖
+    diff = (diff * 255).astype("uint8")    # 把值拉到0~255之間，並設定格式是uint8，確保是圖片的格式
+    return score, diff
 
 
 def normalization(arr):
     min_v = np.min(arr)
     max_v = np.max(arr)
-
-    arr = (arr - min_v) / (max_v - min_v)
+    arr = (arr - min_v) / (max_v - min_v)    # 正規化公式
     arr = (arr * 255).astype(np.uint8)
-
     return arr

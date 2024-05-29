@@ -24,27 +24,38 @@ SOFTWARE.
 
 import cv2
 import numpy as np
-from utils import show_img
+from utils import show_img, convert_to_0_and_255
 from time import time
-from convert_to_0_and_255 import convert_8_to_1_bit
 
 def jarvis_judice_ninke_dither(image):
+    # 為了要記錄誤差，因此格式要設成float
     pixels = image.astype(float)
+
+    # 記錄圖片大小，以便後續疊代
     height, width = pixels.shape
 
     for y in range(height):
         for x in range(width):
+            # 記錄原始值
             old_pixel = pixels[y, x]
+
+            # 把像素二值化，Threshold設定128
             new_pixel = 255 if old_pixel > 128 else 0
             pixels[y, x] = new_pixel
+
+            # 計算誤差
             error = old_pixel - new_pixel
 
             # 分散誤差
+            # [0 0 X 7 5]
+            # [3 5 7 5 3]
+            # [1 3 5 3 1]
+            # 同一列
             if x + 1 < width:
                 pixels[y, x + 1] += error * 7 / 48
             if x + 2 < width:
                 pixels[y, x + 2] += error * 5 / 48
-
+            # 下一列
             if y + 1 < height:
                 if x - 2 >= 0:
                     pixels[y + 1, x - 2] += error * 3 / 48
@@ -55,7 +66,7 @@ def jarvis_judice_ninke_dither(image):
                     pixels[y + 1, x + 1] += error * 5 / 48
                 if x + 2 < width:
                     pixels[y + 1, x + 2] += error * 3 / 48
-
+            # 下二列
             if y + 2 < height:
                 if x - 2 >= 0:
                     pixels[y + 2, x - 2] += error * 1 / 48
@@ -75,7 +86,7 @@ image = cv2.imread('photos/profile_photo_1025.jpg', cv2.IMREAD_GRAYSCALE)
 if image is None:
     raise FileNotFoundError('Image file not found.')
 
-# 執行 Jarvis, Judice, and Ninke Dithering
+# 執行 Jarvis, Judice, and Ninke (JJN) Dithering，並計時
 start_t = time()
 dithered_image = jarvis_judice_ninke_dither(image)
 end_t = time()
