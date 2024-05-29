@@ -25,6 +25,8 @@ SOFTWARE.
 import cv2
 import numpy as np
 from utils import show_img
+from time import time
+from convert_to_0_and_255 import convert_8_to_1_bit
 
 def ordered_dither(image, bayer_matrix):
     bayer_matrix = np.array(bayer_matrix, dtype=float)
@@ -89,12 +91,51 @@ image = cv2.imread('photos/profile_photo_1025.jpg', cv2.IMREAD_GRAYSCALE)
 if image is None:
     raise FileNotFoundError('Image file not found.')
 
-# 執行 Bayer Matrix (Ordered Dithering)
+t_2x2 = 0
+t_4x4 = 0
+t_8x8 = 0
+
+# # 執行 Bayer Matrix (Ordered Dithering)
+# for i in range(10):
+#     start_t_2x2 = time()
+#     dithered_image_2x2 = ordered_dither(image, bayer_2x2)
+#     end_t_2x2 = time()
+#     t_2x2 += (end_t_2x2 - start_t_2x2)
+#     start_t_4x4 = time()
+#     dithered_image_4x4 = ordered_dither(image, bayer_4x4)
+#     end_t_4x4 = time()
+#     t_4x4 += (end_t_4x4 - start_t_4x4)
+#     start_t_8x8 = time()
+#     dithered_image_8x8 = ordered_dither(image, bayer_8x8)
+#     end_t_8x8 = time()
+#     t_8x8 += (end_t_8x8 - start_t_8x8)
+# t_2x2 /= 10
+# t_4x4 /= 10
+# t_8x8 /= 10
+
+start_t_2x2 = time()
 dithered_image_2x2 = ordered_dither(image, bayer_2x2)
+end_t_2x2 = time()
+t_2x2 += (end_t_2x2 - start_t_2x2)
+start_t_4x4 = time()
 dithered_image_4x4 = ordered_dither(image, bayer_4x4)
+end_t_4x4 = time()
+t_4x4 += (end_t_4x4 - start_t_4x4)
+start_t_8x8 = time()
 dithered_image_8x8 = ordered_dither(image, bayer_8x8)
+end_t_8x8 = time()
+t_8x8 += (end_t_8x8 - start_t_8x8)
+
+print("2x2執行時間：" + str(round(t_2x2, 3)) + "s")
+print("4x4執行時間：" + str(round(t_4x4, 3)) + "s")
+print("8x8執行時間：" + str(round(t_8x8, 3)) + "s")
+
+dithered_image_2x2 = convert_8_to_1_bit(dithered_image_2x2)
+dithered_image_4x4 = convert_8_to_1_bit(dithered_image_4x4)
+dithered_image_8x8 = convert_8_to_1_bit(dithered_image_8x8)
 
 # 儲存結果圖
+cv2.imwrite('photos/1025_gray_scale.png', image)
 cv2.imwrite('photos/bayer_matrix_dithering_2x2.png', dithered_image_2x2)
 cv2.imwrite('photos/bayer_matrix_dithering_4x4.png', dithered_image_4x4)
 cv2.imwrite('photos/bayer_matrix_dithering_8x8.png', dithered_image_8x8)

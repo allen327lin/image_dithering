@@ -25,6 +25,8 @@ SOFTWARE.
 import cv2
 import numpy as np
 from utils import show_img
+from time import time
+from convert_to_0_and_255 import convert_8_to_1_bit
 
 def jarvis_judice_ninke_dither(image):
     pixels = image.astype(float)
@@ -74,7 +76,10 @@ if image is None:
     raise FileNotFoundError('Image file not found.')
 
 # 執行 Jarvis, Judice, and Ninke Dithering
+start_t = time()
 dithered_image = jarvis_judice_ninke_dither(image)
+end_t = time()
+print("執行時間：" + str(round(end_t - start_t, 3)) + "s")
 
 # 儲存結果圖
 cv2.imwrite('photos/JJN_dithering.png', dithered_image)

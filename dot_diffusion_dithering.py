@@ -25,6 +25,8 @@ SOFTWARE.
 import cv2
 import numpy as np
 from utils import show_img
+from time import time
+from convert_to_0_and_255 import convert_8_to_1_bit
 
 def dot_diffusion_dithering(image, diffusion_matrix):
     height, width = image.shape
@@ -68,7 +70,10 @@ if image is None:
     raise FileNotFoundError('Image file not found.')
 
 # 应用 Dot Diffusion Dithering
+start_t = time()
 dithered_image = dot_diffusion_dithering(image, diffusion_matrix)
+end_t = time()
+print("執行時間：" + str(round(end_t - start_t, 3)) + "s")
 
 # 保存处理后的图像
 cv2.imwrite('photos/dot_diffusion_dithering.png', dithered_image)
